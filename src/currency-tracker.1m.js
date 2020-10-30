@@ -1,4 +1,4 @@
-#!/usr/bin/env /Users/t00114/.nodebrew/current/bin/node
+#!/usr/bin/env /usr/local/bin/node
 
 const fetch = require('node-fetch');
 const { exec } = require('child_process');
