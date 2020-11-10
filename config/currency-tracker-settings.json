@@ -1,13 +1,13 @@
 {
   "currencyTypes": ["USDJPY", "GBPUSD"],
   "holds": {
-    "USDJPY": 103.529
+    "USDJPY": 105.0
   },
   "threshholds": {
     "USDJPY": [
-      { "check": "abs", "value": 30 },
-      { "check": "low", "value": 103.40 },
-      { "check": "high", "value": 103.60 }
+      { "check": "high", "value": 105.2 },
+      { "check": "low", "value": 104.8 },
+      { "_check": "abs", "value": 150 }
     ]
   }
 }
