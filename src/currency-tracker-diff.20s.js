@@ -2,7 +2,7 @@
 
 const fetch = require('node-fetch');
 const { exec } = require('child_process');
-const settings = require('../config/currency-tracker-settings.json');
+const settings = require('../config/currency-tracker-settings');
 
 const { currencyTypes, holds, threshholds } = settings;
 
