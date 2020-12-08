@@ -4,15 +4,9 @@ const fetch = require('node-fetch');
 const { exec } = require('child_process');
 const settings = require('../config/currency-tracker-settings');
 
-const { currencyTypes, holds, threshholds } = settings;
+const alert = say => exec(`say ${say}`);
 
-const alert = () => {
-  exec(`say ping pon`);
-  // const times = 3;
-  // [...Array(3)].forEach((_, repeat) => {
-  //   exec(`say ${repeat} ping pon`);
-  // });
-};
+const { say, displayDiff, currencyTypes, holds, threshholds, rate } = settings;
 
 const coloring = (v, color = 'red') => {
   return `${v} | color=${color}`;
@@ -42,7 +36,7 @@ const formated = ({ pair, bid }) => {
     });
 
     if (isWarn.includes(true)) {
-      alert();
+      alert(say);
       return coloring(ret, 'red');
     }
   }
