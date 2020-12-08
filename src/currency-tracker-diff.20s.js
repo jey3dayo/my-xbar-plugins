@@ -17,8 +17,8 @@ const calcPips = (pair, bid) => {
 };
 
 const formated = ({ pair, bid }) => {
-  const target = pair in holds ? calcPips(pair, bid) : bid;
-  const ret = `${pair}: ${bid} [${target}]`;
+  const target = pair in holds ? ` [${calcPips(pair, bid)}]` : '';
+  const ret = displayDiff ? `${pair}: ${bid}${target}` : `${pair}: ${bid}`;
 
   if (pair in threshholds) {
     // しきい値もしくは、指定金額以上動いたら
