@@ -1,8 +1,10 @@
-const avg = 105.46;
-const band = 0.03;
-
 const settings = {
-  currencyTypes: ['USDJPY', 'GBPUSD'],
+  say: 'ping pon',
+  displayDiff: true,
+  // currencyTypes: ['USDJPY', 'GBPUSD'],
+  // currencyTypes: ['EURJPY', 'USDJPY'],
+  // currencyTypes: ['EURJPY'],
+  currencyTypes: ['GBPUSD'],
   holds: {
     // USDJPY: 104.307,
     // GBPUSD: 1.32919,
@@ -11,10 +13,13 @@ const settings = {
     GBPUSD: 100000,
   },
   threshholds: {
+    GBPUSD: [
+      { check: 'high', value: 1.346 },
+      { check: 'low', value: 1.327 },
+    ],
     USDJPY: [
-      { check: 'high', value: avg + band },
-      { _check: 'low', value: 104.8 },
-      { _check: 'abs', value: 150 },
+      // { check: 'high', value: 104.5 },
+      // { check: 'low', value: 103.75 },
     ],
   },
 };
