@@ -4,7 +4,11 @@ const band = 0.03;
 const settings = {
   currencyTypes: ['USDJPY', 'GBPUSD'],
   holds: {
-    USDJPY: avg,
+    // USDJPY: 104.307,
+    // GBPUSD: 1.32919,
+  },
+  rate: {
+    GBPUSD: 100000,
   },
   threshholds: {
     USDJPY: [

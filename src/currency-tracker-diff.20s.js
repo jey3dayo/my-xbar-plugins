@@ -13,7 +13,7 @@ const coloring = (v, color = 'red') => {
 };
 
 const calcPips = (pair, bid) => {
-  return Math.round((bid - holds[pair]) * 1000);
+  return Math.round((bid - holds[pair]) * (rate[pair] ?? 1000));
 };
 
 const formated = ({ pair, bid }) => {
