@@ -12,23 +12,25 @@
   "author": "https://github.com/jey3dayo/bitbar-configs",
   "license": "UNLICENSED",
   "devDependencies": {
-    "@babel/core": "^7.12.3",
-    "@babel/node": "^7.12.6",
-    "@babel/preset-env": "7.12.1",
+    "@babel/core": "^7.12.10",
+    "@babel/node": "^7.12.10",
+    "@babel/preset-env": "7.12.10",
     "babel-eslint": "10.1.0",
-    "babel-loader": "^8.2.1",
-    "eslint": "7.13.0",
+    "babel-loader": "^8.2.2",
+    "eslint": "7.15.0",
     "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-config-prettier": "^6.15.0",
+    "eslint-config-prettier": "^7.0.0",
     "eslint-plugin-babel": "^5.3.1",
     "eslint-plugin-import": "^2.22.1",
     "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-prettier": "^3.1.4",
-    "prettier": "^2.1.2"
+    "eslint-plugin-prettier": "^3.2.0",
+    "prettier": "^2.2.1"
   },
   "dependencies": {
     "node-fetch": "^2.6.1",
-    "url-parse": "^1.4.7"
+    "package.json": "^2.0.1",
+    "url-parse": "^1.4.7",
+    "yarn.lock": "^0.0.1-security"
   },
   "private": true
 }
