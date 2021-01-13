@@ -40,24 +40,21 @@ const formated = ({ pair, bid, hold, enable }) => {
   return ret;
 };
 
+const prioritySort = (a, b) => (a.priority > b.priority ? 1 : -1);
+
 const main = async () => {
   const res = await fetch('https://www.gaitameonline.com/rateaj/getrate');
   const result = await res.json();
 
-  // TODO: posions回したほうがよかったね
-  const types = Object.keys(positions);
-  const quotes = result.quotes
-    .filter(v => types.includes(v.currencyPairCode))
-    .map(v => ({ bid: v.bid, pair: v.currencyPairCode }));
+  const quoteByPair = {};
+  result.quotes.forEach(v => {
+    quoteByPair[v.currencyPairCode] = v;
+  });
 
-  const quote = quotes.pop();
-  const position = positions[quote.pair];
-  console.log(formated({ ...quote, ...position }));
-  console.log('---');
-
-  quotes.forEach(v => {
-    const output = formated(v);
-    console.log(output);
+  const summary = positions.map(v => ({ ...v, ...quoteByPair[v.pair] })).sort(prioritySort);
+  summary.forEach((v, i) => {
+    console.log(formated(v));
+    if (i === 0) console.log('---');
   });
 };
 
