@@ -6,15 +6,15 @@ const settings = require('../config/currency-tracker-settings');
 
 const alert = say => exec(`say ${say}`);
 
-const { say, displayDiff, currencyTypes, holds, threshholds, rate } = settings;
+const { say, positions, threshholds, rate } = settings;
 
 const coloring = (v, color = 'red') => `${v} | color=${color}`;
 
-const calcPips = (pair, bid) => Math.round((bid - holds[pair]) * (rate[pair] ?? 1000));
+const calcPips = (pair, bid, hold) => Math.round((bid - hold) * (rate[pair] ?? 1000));
 
-const formated = ({ pair, bid }) => {
-  const target = pair in holds ? ` [${calcPips(pair, bid)}]` : '';
-  const ret = displayDiff ? `${pair}: ${bid}${target}` : `${pair}: ${bid}`;
+const formated = ({ pair, bid, hold, enable }) => {
+  const target = hold ? ` [${calcPips(pair, bid, hold)}]` : '';
+  const ret = enable ? `${pair}: ${bid}${target}` : `${pair}: ${bid}`;
 
   if (pair in threshholds) {
     // しきい値もしくは、指定金額以上動いたら
@@ -44,16 +44,18 @@ const main = async () => {
   const res = await fetch('https://www.gaitameonline.com/rateaj/getrate');
   const result = await res.json();
 
-  const pairs = result.quotes
-    .filter(v => currencyTypes.includes(v.currencyPairCode))
+  // TODO: posions回したほうがよかったね
+  const types = Object.keys(positions);
+  const quotes = result.quotes
+    .filter(v => types.includes(v.currencyPairCode))
     .map(v => ({ bid: v.bid, pair: v.currencyPairCode }));
 
-  // const head = pairs.shift();
-  const head = pairs.pop();
-  console.log(formated(head));
+  const quote = quotes.pop();
+  const position = positions[quote.pair];
+  console.log(formated({ ...quote, ...position }));
   console.log('---');
 
-  pairs.forEach(v => {
+  quotes.forEach(v => {
     const output = formated(v);
     console.log(output);
   });
