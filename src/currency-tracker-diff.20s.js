@@ -8,13 +8,9 @@ const alert = say => exec(`say ${say}`);
 
 const { say, displayDiff, currencyTypes, holds, threshholds, rate } = settings;
 
-const coloring = (v, color = 'red') => {
-  return `${v} | color=${color}`;
-};
+const coloring = (v, color = 'red') => `${v} | color=${color}`;
 
-const calcPips = (pair, bid) => {
-  return Math.round((bid - holds[pair]) * (rate[pair] ?? 1000));
-};
+const calcPips = (pair, bid) => Math.round((bid - holds[pair]) * (rate[pair] ?? 1000));
 
 const formated = ({ pair, bid }) => {
   const target = pair in holds ? ` [${calcPips(pair, bid)}]` : '';
