@@ -12,9 +12,9 @@ const coloring = (v, color = 'red') => `${v} | color=${color}`;
 
 const calcPips = (pair, bid, hold) => Math.round((bid - hold) * (rate[pair] ?? 1000));
 
-const formated = ({ pair, bid, hold, enable }) => {
-  const target = hold ? ` [${calcPips(pair, bid, hold)}]` : '';
-  const ret = enable ? `${pair}: ${bid}${target}` : `${pair}: ${bid}`;
+const formated = ({ pair, bid, hold, monitoring }) => {
+  const position = hold ? ` [${calcPips(pair, bid, hold)}]` : '';
+  const ret = `${pair}: ${bid}${position}`;
 
   if (pair in threshholds) {
     // しきい値もしくは、指定金額以上動いたら
@@ -25,13 +25,13 @@ const formated = ({ pair, bid, hold, enable }) => {
         case 'low':
           return bid <= value;
         case 'abs':
-          return Math.abs(target) > value;
+          return Math.abs(position) > value;
         default:
           return false;
       }
     });
 
-    if (isWarn.includes(true)) {
+    if (monitoring && isWarn.includes(true)) {
       alert(say);
       return coloring(ret, 'red');
     }

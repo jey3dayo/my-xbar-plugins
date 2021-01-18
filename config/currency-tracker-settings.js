@@ -1,13 +1,14 @@
 const settings = {
   say: 'ping pon',
   positions: [
-    { pair: 'GBPUSD', hold: 1.36319, enable: true, priority: 1 },
-    // { pair: 'USDJPY', hold: 104.1, enable: true, priority: 2 },
+    // { pair: 'GBPUSD', hold: 1.36319, monitoring: true, priority: 1 },
+    { pair: 'GBPUSD', monitoring: true, priority: 1 },
+    // { pair: 'USDJPY', hold: 104.1, monitoring: true, priority: 2 },
   ],
   threshholds: {
     GBPUSD: [
       { check: 'high', value: 1.37 },
-      { check: 'low', value: 1.358 },
+      { check: 'low', value: 1.359 },
     ],
     // GBPJPY: [
     //   { check: 'high', value: 138.9 },
