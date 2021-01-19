@@ -1,5 +1,7 @@
 const settings = {
   say: 'ping pon',
+  // target: 'bid',
+  type: 'ask',
   positions: [
     // { pair: 'GBPUSD', hold: 1.36319, monitoring: true, priority: 1 },
     { pair: 'GBPUSD', monitoring: true, priority: 1 },

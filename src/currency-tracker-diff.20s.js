@@ -6,24 +6,25 @@ const settings = require('../config/currency-tracker-settings');
 
 const alert = say => exec(`say ${say}`);
 
-const { say, positions, threshholds, rate } = settings;
+const { say, positions, threshholds, rate, type } = settings;
 
 const coloring = (v, color = 'red') => `${v} | color=${color}`;
 
-const calcPips = (pair, bid, hold) => Math.round((bid - hold) * (rate[pair] ?? 1000));
+const calcPips = (pair, price, hold) => Math.round((price - hold) * (rate[pair] ?? 1000));
 
-const formated = ({ pair, bid, hold, monitoring }) => {
-  const position = hold ? ` [${calcPips(pair, bid, hold)}]` : '';
-  const ret = `${pair}: ${bid}${position}`;
+const formated = ({ pair, bid, ask, hold, monitoring }) => {
+  const price = type === 'bid' ? bid : ask;
+  const position = hold ? ` [${calcPips(pair, price, hold)}]` : '';
+  const ret = `${pair}: ${price}${position}`;
 
   if (pair in threshholds) {
     // しきい値もしくは、指定金額以上動いたら
     const isWarn = (threshholds[pair] ?? []).map(({ check, value }) => {
       switch (check) {
         case 'high':
-          return bid >= value;
+          return price >= value;
         case 'low':
-          return bid <= value;
+          return price <= value;
         case 'abs':
           return Math.abs(position) > value;
         default:
