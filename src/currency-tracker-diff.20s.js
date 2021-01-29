@@ -6,7 +6,7 @@ const settings = require('../config/currency-tracker-settings');
 
 const alert = say => exec(`say ${say}`);
 
-const { say, positions, threshholds, rate, type } = settings;
+const { say, type, positions, threshholds, rate, format } = settings;
 
 const coloring = (v, color = 'red') => `${v} | color=${color}`;
 
@@ -15,7 +15,7 @@ const calcPips = (pair, price, hold) => Math.round((price - hold) * (rate[pair] 
 const formated = ({ pair, bid, ask, hold, monitoring }) => {
   const price = type === 'bid' ? bid : ask;
   const position = hold ? ` [${calcPips(pair, price, hold)}]` : '';
-  const ret = `${pair}: ${price}${position}`;
+  const ret = `${format?.[pair] ?? pair} ${price}${position}`;
 
   if (pair in threshholds) {
     // しきい値もしくは、指定金額以上動いたら

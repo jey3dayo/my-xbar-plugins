@@ -25,6 +25,10 @@ const settings = {
     GBPUSD: 100000,
     GBPJPY: 1000,
   },
+  format: {
+    GBPUSD: '£/$',
+    USDJPY: '$/¥',
+  },
 };
 
 module.exports = settings;
