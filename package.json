@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "bitbar scripts",
   "scripts": {
+    "eslint": "eslint --ext .js --fix './src/**' && prettier --write './src/**/*.js'",
     "currency": "babel-node ./currency-tracker.js"
   },
   "repository": {

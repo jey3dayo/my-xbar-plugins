@@ -10,12 +10,25 @@ const { say, type, positions, threshholds, rate, format } = settings;
 
 const coloring = (v, color = 'red') => `${v} | color=${color}`;
 
-const calcPips = (pair, price, hold) => Math.round((price - hold) * (rate[pair] ?? 1000));
+const calcPips = (pair, price, hold) => (hold ? Math.round((price - hold) * (rate[pair] ?? 1000)) : null);
 
-const formated = ({ pair, bid, ask, hold, monitoring }) => {
+const print = (pips, profit) => {
+  if (pips && profit) {
+    return ` [${pips} : ${profit}]`;
+  }
+  if (pips) {
+    return ` [${pips}]`;
+  }
+  return '';
+};
+
+const formatted = ({ pair, bid, ask, hold, quantity, slip, monitoring }) => {
   const price = type === 'bid' ? bid : ask;
-  const position = hold ? ` [${calcPips(pair, price, hold)}]` : '';
-  const ret = `${format?.[pair] ?? pair} ${price}${position}`;
+  const pips = calcPips(pair, price, hold) + (slip ?? 0);
+  const profit = pips ? pips * quantity : '';
+  const text = print(pips, profit);
+
+  const ret = `${format?.[pair] ?? pair} ${price}${text}`;
 
   if (pair in threshholds) {
     // しきい値もしくは、指定金額以上動いたら
@@ -26,7 +39,7 @@ const formated = ({ pair, bid, ask, hold, monitoring }) => {
         case 'low':
           return price <= value;
         case 'abs':
-          return Math.abs(position) > value;
+          return Math.abs(print) > value;
         default:
           return false;
       }
@@ -54,7 +67,7 @@ const main = async () => {
 
   const summary = positions.map(v => ({ ...v, ...quoteByPair[v.pair] })).sort(prioritySort);
   summary.forEach((v, i) => {
-    console.log(formated(v));
+    console.log(formatted(v));
     if (i === 0) console.log('---');
   });
 };
