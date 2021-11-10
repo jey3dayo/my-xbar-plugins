@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 const { exec } = require('child_process');
 const settings = require('../config/currency-tracker-settings');
 
-const alert = say => exec(`say ${say}`);
+const alert = say => (say ? exec(`say ${say}`) : null);
 
 const { say, type, positions, threshholds, rate, format } = settings;
 

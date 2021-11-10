@@ -1,25 +1,19 @@
 const settings = {
-  say: 'ping pon',
+  // say: 'ping pon',
+  say: null,
   // target: 'bid',
   type: 'ask',
-  positions: [
-    // { pair: 'GBPUSD', hold: 1.36319, monitoring: true, priority: 1 },
-    { pair: 'GBPUSD', monitoring: true, priority: 1 },
-    // { pair: 'USDJPY', hold: 104.1, monitoring: true, priority: 2 },
-  ],
+  positions: [{ pair: 'USDJPY', hold: 112.942, monitoring: true, priority: 1 }],
   threshholds: {
     GBPUSD: [
-      { check: 'high', value: 1.37 },
-      { check: 'low', value: 1.359 },
+      { check: 'high', value: 1.3932 },
+      // { check: 'low', value: 1.3605 },
+      { check: 'low', value: 1.372 },
     ],
-    // GBPJPY: [
-    //   { check: 'high', value: 138.9 },
-    //   { check: 'low', value: 138.7 },
-    // ],
-    // USDJPY: [
-    //   { check: 'high', value: 104.1 },
-    //   { check: 'low', value: 103.5 },
-    // ],
+    USDJPY: [
+      { check: 'high', value: 112.94 },
+      { check: 'low', value: 110.3 },
+    ],
   },
   rate: {
     GBPUSD: 100000,
