@@ -4,9 +4,9 @@ const fetch = require('node-fetch');
 const { exec } = require('child_process');
 const settings = require('../config/currency-tracker-settings');
 
-const alert = say => (say ? exec(`say ${say}`) : null);
-
 const { say, type, positions, threshholds, rate, format } = settings;
+
+const alert = () => (say ? exec(`say ${say}`) : null);
 
 const coloring = (v, color = 'red') => `${v} | color=${color}`;
 
@@ -46,7 +46,7 @@ const formatted = ({ pair, bid, ask, hold, quantity, slip, monitoring }) => {
     });
 
     if (monitoring && isWarn.includes(true)) {
-      alert(say);
+      alert();
       return coloring(ret, 'red');
     }
   }
