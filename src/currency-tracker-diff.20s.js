@@ -1,8 +1,6 @@
-#!/usr/bin/env /usr/local/bin/node
+#!/usr/bin/env /usr/local/bin/deno run --allow-net
 
-const fetch = require('node-fetch');
-const { exec } = require('child_process');
-const settings = require('../config/currency-tracker-settings');
+import settings from '../config/currency-tracker-settings.js';
 
 const { say, type, positions, threshholds, rate, format } = settings;
 
@@ -56,20 +54,16 @@ const formatted = ({ pair, bid, ask, hold, quantity, slip, monitoring }) => {
 
 const prioritySort = (a, b) => (a.priority > b.priority ? 1 : -1);
 
-const main = async () => {
-  const res = await fetch('https://www.gaitameonline.com/rateaj/getrate');
-  const result = await res.json();
+const res = await fetch('https://www.gaitameonline.com/rateaj/getrate');
+const result = await res.json();
 
-  const quoteByPair = {};
-  result.quotes.forEach(v => {
-    quoteByPair[v.currencyPairCode] = v;
-  });
+const quoteByPair = {};
+result.quotes.forEach(v => {
+  quoteByPair[v.currencyPairCode] = v;
+});
 
-  const summary = positions.map(v => ({ ...v, ...quoteByPair[v.pair] })).sort(prioritySort);
-  summary.forEach((v, i) => {
-    console.log(formatted(v));
-    if (i === 0) console.log('---');
-  });
-};
-
-main();
+const summary = positions.map(v => ({ ...v, ...quoteByPair[v.pair] })).sort(prioritySort);
+summary.forEach((v, i) => {
+  console.log(formatted(v));
+  if (i === 0) console.log('---');
+});

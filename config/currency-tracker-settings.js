@@ -11,7 +11,7 @@ const settings = {
       { check: 'low', value: 1.372 },
     ],
     USDJPY: [
-      { check: 'high', value: 113.4 },
+      { check: 'high', value: 114.2 },
       { check: 'low', value: 110.3 },
     ],
   },
@@ -25,4 +25,4 @@ const settings = {
   },
 };
 
-module.exports = settings;
+export default settings;

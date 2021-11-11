@@ -4,7 +4,7 @@
   "description": "bitbar scripts",
   "scripts": {
     "eslint": "eslint --ext .js --fix './src/**' && prettier --write './src/**/*.js'",
-    "currency": "babel-node ./currency-tracker.js"
+    "currency": "deno run --allow-net src/currency-tracker-diff.20s.js"
   },
   "repository": {
     "type": "git",
@@ -22,16 +22,12 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-babel": "^5.3.1",
-    "eslint-plugin-import": "^2.25.2",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
     "eslint-plugin-prettier": "^4.0.0",
     "prettier": "^2.4.1"
   },
   "dependencies": {
-    "node-fetch": "^2.0.0",
-    "package.json": "^2.0.1",
-    "url-parse": "^1.5.3",
-    "yarn.lock": "^0.0.1-security"
   },
   "private": true
 }
