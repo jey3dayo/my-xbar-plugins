@@ -1,9 +1,9 @@
-export default {
+const settings = {
   // say: 'ping pon',
   say: null,
   // target: 'bid',
   type: 'ask',
-  positions: [{ pair: 'USDJPY', hold: 114.68, monitoring: true, priority: 1 }],
+  positions: [{ pair: 'USDJPY', hold: 114.0, monitoring: true, priority: 1 }],
   threshholds: {
     GBPUSD: [
       { check: 'high', value: 1.3932 },
@@ -24,3 +24,5 @@ export default {
     USDJPY: '$/¥',
   },
 };
+
+export default settings;
