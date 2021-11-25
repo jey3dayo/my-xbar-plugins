@@ -1,6 +1,6 @@
 #!/usr/bin/env /usr/local/bin/deno run --allow-net
 
-import settings from '../config/currency-tracker-settings.js';
+import settings from './config/currency-tracker-settings.js';
 
 const { say, type, positions, threshholds, rate, format } = settings;
 

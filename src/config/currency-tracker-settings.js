@@ -1,9 +1,9 @@
-const settings = {
+export default {
   // say: 'ping pon',
   say: null,
   // target: 'bid',
   type: 'ask',
-  positions: [{ pair: 'USDJPY', hold: 112.942, monitoring: true, priority: 1 }],
+  positions: [{ pair: 'USDJPY', hold: 114.68, monitoring: true, priority: 1 }],
   threshholds: {
     GBPUSD: [
       { check: 'high', value: 1.3932 },
@@ -11,8 +11,8 @@ const settings = {
       { check: 'low', value: 1.372 },
     ],
     USDJPY: [
-      { check: 'high', value: 114.2 },
-      { check: 'low', value: 110.3 },
+      { check: 'high', value: 115.5 },
+      { check: 'low', value: 113.0 },
     ],
   },
   rate: {
@@ -24,5 +24,3 @@ const settings = {
     USDJPY: '$/¥',
   },
 };
-
-export default settings;
