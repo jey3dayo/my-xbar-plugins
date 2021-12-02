@@ -3,16 +3,11 @@ const settings = {
   say: null,
   // target: 'bid',
   type: 'ask',
-  positions: [{ pair: 'USDJPY', hold: 114.0, monitoring: true, priority: 1 }],
+  positions: [{ pair: 'USDJPY', hold: 113.028, monitoring: true, priority: 1 }],
   threshholds: {
-    GBPUSD: [
-      { check: 'high', value: 1.3932 },
-      // { check: 'low', value: 1.3605 },
-      { check: 'low', value: 1.372 },
-    ],
     USDJPY: [
-      { check: 'high', value: 115.5 },
-      { check: 'low', value: 113.0 },
+      { check: 'high', value: 113.7 },
+      { check: 'low', value: 112.5 },
     ],
   },
   rate: {

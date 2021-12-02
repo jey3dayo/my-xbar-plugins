@@ -8,7 +8,11 @@ const alert = () => (say ? exec(`say ${say}`) : null);
 
 const coloring = (v, color = 'red') => `${v} | color=${color}`;
 
-const calcPips = (pair, price, hold) => (hold ? Math.round((price - hold) * (rate[pair] ?? 1000)) : null);
+const calcPips = (
+  pair,
+  price,
+  hold,
+) => (hold ? Math.round((price - hold) * (rate[pair] ?? 1000)) : null);
 
 const print = (pips, profit) => {
   if (pips && profit) {
@@ -58,11 +62,13 @@ const res = await fetch('https://www.gaitameonline.com/rateaj/getrate');
 const result = await res.json();
 
 const quoteByPair = {};
-result.quotes.forEach(v => {
+result.quotes.forEach((v) => {
   quoteByPair[v.currencyPairCode] = v;
 });
 
-const summary = positions.map(v => ({ ...v, ...quoteByPair[v.pair] })).sort(prioritySort);
+const summary = positions.map((v) => ({ ...v, ...quoteByPair[v.pair] })).sort(
+  prioritySort,
+);
 summary.forEach((v, i) => {
   console.log(formatted(v));
   if (i === 0) console.log('---');
