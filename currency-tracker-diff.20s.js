@@ -1,25 +1,6 @@
 #!/usr/bin/env /usr/local/bin/deno run --allow-net
 
-const settings = {
-  // say: 'ping pon',
-  say: null,
-  type: 'ask',
-  positions: [{ pair: 'USDJPY', hold: 115.186, monitoring: true, priority: 1 }], // head
-  threshholds: {
-    USDJPY: [
-      { check: 'high', value: 115.5 },
-      { check: 'low', value: 113.2 },
-    ],
-  },
-  rate: {
-    GBPUSD: 100000,
-    GBPJPY: 1000,
-  },
-  format: {
-    GBPUSD: '£/$',
-    USDJPY: '$/¥',
-  },
-};
+import settings from './config/currency-tracker-diff.config.js';
 
 const { say, type, positions, threshholds, rate, format } = settings;
 
