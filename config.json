@@ -1,0 +1,33 @@
+{
+  "api": {
+    "url": "https://www.gaitameonline.com/rateaj/getrate",
+    "retries": 3,
+    "timeout": 5000
+  },
+  "display": {
+    "type": "ask",
+    "alertCommand": null
+  },
+  "currencies": {
+    "USDJPY": {
+      "symbol": "$/¥",
+      "multiplier": 1000,
+      "thresholds": {
+        "high": { "offset": 0.6 },
+        "low": { "offset": -0.6 }
+      }
+    },
+    "GBPUSD": {
+      "symbol": "£/$",
+      "multiplier": 100000
+    },
+    "GBPJPY": {
+      "symbol": "£/¥",
+      "multiplier": 1000
+    }
+  },
+  "defaults": {
+    "multiplier": 1000,
+    "pair": "USDJPY"
+  }
+}
