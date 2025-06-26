@@ -3,95 +3,130 @@ import { config } from "https://deno.land/x/dotenv/mod.ts";
 
 config({ export: true });
 
-const hold = parseFloat(Deno.env.get("HOLD"));
-const pair = Deno.env.get("PAIR");
-const positions = [{ pair: "USDJPY", hold, monitoring: true, priority: 1 }];
+const API_URL = "https://www.gaitameonline.com/rateaj/getrate";
+const DEFAULT_MULTIPLIER = 1000;
 
-export const settings = {
-  // say: 'ping pon',
+const getEnvFloat = (key) => {
+  const value = Deno.env.get(key);
+  if (!value) throw new Error(`環境変数 ${key} が設定されていません`);
+  const parsed = parseFloat(value);
+  if (isNaN(parsed)) throw new Error(`環境変数 ${key} は有効な数値ではありません`);
+  return parsed;
+};
+
+const hold = getEnvFloat("HOLD");
+const pair = Deno.env.get("PAIR") || "USDJPY";
+
+const settings = {
   say: null,
   type: "ask",
-  threshholds: {
+  thresholds: {
     USDJPY: [
       { check: "high", value: hold + 0.6 },
       { check: "low", value: hold - 0.6 },
     ],
   },
-  rate: {
+  multipliers: {
     GBPUSD: 100000,
     GBPJPY: 1000,
+    USDJPY: 1000,
   },
-  format: {
+  symbols: {
     GBPUSD: "£/$",
     USDJPY: "$/¥",
   },
 };
 
-const { say, type, threshholds, rate, format } = settings;
+const positions = [
+  { pair, hold, monitoring: true, priority: 1 }
+];
 
-const alert = () => (say ? exec(`say ${say}`) : null);
+const alert = (message) => {
+  if (message) console.log(`say ${message}`);
+};
 
-const coloring = (v, color = "red") => `${v} | color=${color}`;
+const colorize = (text, color = "red") => `${text} | color=${color}`;
 
-const calcPips = (pair, price, hold) => (hold ? Math.round((price - hold) * (rate[pair] ?? 1000)) : null);
+const calcPips = (pair, price, hold) => {
+  if (!hold) return null;
+  const multiplier = settings.multipliers[pair] || DEFAULT_MULTIPLIER;
+  return Math.round((price - hold) * multiplier);
+};
 
-const print = (pips, profit) => {
-  if (pips && profit) {
-    return ` [${pips} : ${profit}]`;
-  }
-  if (pips) {
-    return ` [${pips}]`;
-  }
+const formatPipsProfit = (pips, profit) => {
+  if (pips && profit) return ` [${pips} : ${profit}]`;
+  if (pips) return ` [${pips}]`;
   return "";
 };
 
-const formatted = ({ pair, bid, ask, hold, quantity, slip }) => {
-  const price = type === "bid" ? bid : ask;
-  const pips = calcPips(pair, price, hold) + (slip ?? 0);
-  const profit = pips ? pips * quantity : "";
-  const text = print(pips, profit);
-
-  const ret = `${format?.[pair] ?? pair} ${price}${text}`;
-
-  if (pair in threshholds) {
-    // しきい値もしくは、指定金額以上動いたら
-    const isWarn = (threshholds[pair] ?? []).map(({ check, value }) => {
-      switch (check) {
-        case "high":
-          return price >= value;
-        case "low":
-          return price <= value;
-        case "abs":
-          return Math.abs(print) > value;
-        default:
-          return false;
-      }
-    });
-
-    if (isWarn.includes(true)) {
-      alert();
-      return coloring(ret, "red");
+const checkThreshold = (pair, price, pips) => {
+  const thresholds = settings.thresholds[pair];
+  if (!thresholds) return false;
+  
+  return thresholds.some(({ check, value }) => {
+    switch (check) {
+      case "high": return price >= value;
+      case "low": return price <= value;
+      case "abs": return pips && Math.abs(pips) > value;
+      default: return false;
     }
-  }
-
-  return ret;
+  });
 };
 
-const prioritySort = (a, b) => (a.priority > b.priority ? 1 : -1);
+const formatPosition = ({ pair, bid, ask, hold, quantity, slip }) => {
+  const price = settings.type === "bid" ? bid : ask;
+  const pips = calcPips(pair, price, hold);
+  const adjustedPips = pips !== null ? pips + (slip || 0) : null;
+  const profit = adjustedPips && quantity ? adjustedPips * quantity : "";
+  
+  const symbol = settings.symbols[pair] || pair;
+  const text = formatPipsProfit(adjustedPips, profit);
+  const output = `${symbol} ${price}${text}`;
+  
+  if (checkThreshold(pair, price, adjustedPips)) {
+    alert(settings.say);
+    return colorize(output, "red");
+  }
+  
+  return output;
+};
 
-const res = await fetch("https://www.gaitameonline.com/rateaj/getrate");
-const result = await res.json();
+const fetchQuotes = async () => {
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) {
+      throw new Error(`HTTPエラー: ${response.status}`);
+    }
+    const data = await response.json();
+    
+    return data.quotes.reduce((acc, quote) => {
+      acc[quote.currencyPairCode] = quote;
+      return acc;
+    }, {});
+  } catch (error) {
+    console.error("レート取得エラー:", error.message);
+    throw error;
+  }
+};
 
-const quoteByPair = {};
-result.quotes.forEach((v) => {
-  quoteByPair[v.currencyPairCode] = v;
-});
+const main = async () => {
+  try {
+    const quotes = await fetchQuotes();
+    
+    const activePositions = positions
+      .filter(p => p.monitoring)
+      .map(p => ({ ...p, ...quotes[p.pair] }))
+      .filter(p => p.bid && p.ask)
+      .sort((a, b) => a.priority - b.priority);
+    
+    activePositions.forEach((position, index) => {
+      console.log(formatPosition(position));
+      if (index === 0) console.log("---");
+    });
+  } catch (error) {
+    console.error("エラー:", error.message);
+    Deno.exit(1);
+  }
+};
 
-const summary = positions
-  .filter((v) => v.monitoring)
-  .map((v) => ({ ...v, ...quoteByPair[v.pair] }))
-  .sort(prioritySort);
-summary.forEach((v, i) => {
-  console.log(formatted(v));
-  if (i === 0) console.log("---");
-});
+await main();
