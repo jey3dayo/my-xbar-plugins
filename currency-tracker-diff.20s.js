@@ -1,13 +1,15 @@
-#!/usr/bin/env /usr/local/bin/deno run --allow-net
+#!/usr/bin/env /opt/homebrew/bin/deno run --allow-net --allow-env --allow-read
+import { config } from 'https://deno.land/x/dotenv/mod.ts';
+config({ export: true });
 
-const hold = 140.18;
+const hold = parseFloat(Deno.env.get('HOLD'));
+const pair = Deno.env.get('PAIR');
+const positions = [{ pair: 'USDJPY', hold, monitoring: true, priority: 1 }];
 
 export const settings = {
   // say: 'ping pon',
   say: null,
   type: 'ask',
-  positions: [{ pair: 'USDJPY', hold, monitoring: true, priority: 1 }].filter(v => v.monitoring),
-  // positions: [{ pair: 'USDJPY', hold: null, monitoring: true, priority: 1 }],
   threshholds: {
     USDJPY: [
       { check: 'high', value: hold + 0.6 },
@@ -24,7 +26,7 @@ export const settings = {
   },
 };
 
-const { say, type, positions, threshholds, rate, format } = settings;
+const { say, type, threshholds, rate, format } = settings;
 
 const alert = () => (say ? exec(`say ${say}`) : null);
 
@@ -84,7 +86,7 @@ result.quotes.forEach(v => {
   quoteByPair[v.currencyPairCode] = v;
 });
 
-const summary = positions.map(v => ({ ...v, ...quoteByPair[v.pair] })).sort(prioritySort);
+const summary = positions.filter(v => v.monitoring).map(v => ({ ...v, ...quoteByPair[v.pair] })).sort(prioritySort);
 summary.forEach((v, i) => {
   console.log(formatted(v));
   if (i === 0) console.log('---');
