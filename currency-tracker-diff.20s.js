@@ -1,9 +1,9 @@
 #!/usr/bin/env /opt/homebrew/bin/deno run --allow-net --allow-env --allow-read
-import { config } from "https://deno.land/x/dotenv/mod.ts";
+import { config } from 'https://deno.land/x/dotenv/mod.ts';
 
 config({ export: true });
 
-const CONFIG_FILE = "./config.json";
+const CONFIG_FILE = './config/config.json';
 
 async function loadConfig() {
   try {
@@ -28,7 +28,7 @@ function buildThresholds(currencyConfig, hold) {
 
   return Object.entries(currencyConfig.thresholds).map(([check, config]) => ({
     check,
-    value: hold + (config.offset || 0)
+    value: hold + (config.offset || 0),
   }));
 }
 
@@ -36,7 +36,7 @@ function alert(command) {
   if (command) console.log(`say ${command}`);
 }
 
-function colorize(text, color = "red") {
+function colorize(text, color = 'red') {
   return `${text} | color=${color}`;
 }
 
@@ -50,7 +50,7 @@ function calcPips(pair, price, hold, config) {
 function formatPipsProfit(pips, profit) {
   if (pips && profit) return ` [${pips} : ${profit}]`;
   if (pips) return ` [${pips}]`;
-  return "";
+  return '';
 }
 
 function checkThreshold(pair, price, pips, thresholds) {
@@ -58,19 +58,23 @@ function checkThreshold(pair, price, pips, thresholds) {
 
   return thresholds.some(({ check, value }) => {
     switch (check) {
-      case "high": return price >= value;
-      case "low": return price <= value;
-      case "abs": return pips && Math.abs(pips) > value;
-      default: return false;
+      case 'high':
+        return price >= value;
+      case 'low':
+        return price <= value;
+      case 'abs':
+        return pips && Math.abs(pips) > value;
+      default:
+        return false;
     }
   });
 }
 
 function formatPosition({ pair, bid, ask, hold, quantity, slip }, config, thresholds) {
-  const price = config.display.type === "bid" ? bid : ask;
+  const price = config.display.type === 'bid' ? bid : ask;
   const pips = calcPips(pair, price, hold, config);
   const adjustedPips = pips !== null ? pips + (slip || 0) : null;
-  const profit = adjustedPips && quantity ? adjustedPips * quantity : "";
+  const profit = adjustedPips && quantity ? adjustedPips * quantity : '';
 
   const currencyConfig = config.currencies[pair] || {};
   const symbol = currencyConfig.symbol || pair;
@@ -79,7 +83,7 @@ function formatPosition({ pair, bid, ask, hold, quantity, slip }, config, thresh
 
   if (checkThreshold(pair, price, adjustedPips, thresholds[pair])) {
     alert(config.display.alertCommand);
-    return colorize(output, "red");
+    return colorize(output, 'red');
   }
 
   return output;
@@ -102,7 +106,7 @@ async function fetchQuotes(config) {
       }, {});
     } catch (error) {
       if (i === maxRetries - 1) {
-        console.error("レート取得エラー:", error.message);
+        console.error('レート取得エラー:', error.message);
         throw error;
       }
       await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)));
@@ -113,12 +117,10 @@ async function fetchQuotes(config) {
 async function main() {
   try {
     const config = await loadConfig();
-    const hold = getEnvFloat("HOLD");
-    const pair = Deno.env.get("PAIR") || config.defaults.pair;
+    const hold = getEnvFloat('HOLD');
+    const pair = Deno.env.get('PAIR') || config.defaults.pair;
 
-    const positions = [
-      { pair, hold, monitoring: true, priority: 1 }
-    ];
+    const positions = [{ pair, hold, monitoring: true, priority: 1 }];
 
     // 各通貨ペアのしきい値を事前に計算
     const thresholds = {};
@@ -138,10 +140,10 @@ async function main() {
 
     activePositions.forEach((position, index) => {
       console.log(formatPosition(position, config, thresholds));
-      if (index === 0) console.log("---");
+      if (index === 0) console.log('---');
     });
   } catch (error) {
-    console.error("エラー:", error.message);
+    console.error('エラー:', error.message);
     Deno.exit(1);
   }
 }
