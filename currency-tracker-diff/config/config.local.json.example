@@ -1,0 +1,19 @@
+{
+  "positions": {
+    "USDJPY": {
+      "hold": 150.0,
+      "lot": 2000,
+      "monitoring": true
+    },
+    "GBPJPY": {
+      "hold": 190.5,
+      "lot": 1000,
+      "monitoring": true,
+      "priority": 2
+    },
+    "GBPUSD": {
+      "hold": 1.28,
+      "monitoring": false
+    }
+  }
+}

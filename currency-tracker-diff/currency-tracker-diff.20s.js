@@ -1,29 +1,77 @@
 #!/usr/bin/env -S -P/${HOME}/.deno/bin:/usr/local/bin:/opt/homebrew/bin deno run --allow-net --allow-env --allow-read
-import { config } from 'https://deno.land/x/dotenv/mod.ts';
 
 // スクリプトの実際のディレクトリを取得（シンボリックリンクを解決）
 const scriptPath = Deno.realPathSync(new URL(import.meta.url).pathname);
 const SCRIPT_DIR = scriptPath.substring(0, scriptPath.lastIndexOf('/'));
-config({ export: true, path: `${SCRIPT_DIR}/.env` });
 
 const CONFIG_FILE = `${SCRIPT_DIR}/config/config.json`;
+const LOCAL_CONFIG_FILE = `${SCRIPT_DIR}/config/config.local.json`;
+
+function isPlainObject(obj) {
+  return obj !== null &&
+         typeof obj === 'object' &&
+         !Array.isArray(obj) &&
+         obj.constructor === Object;
+}
+
+function deepMerge(target, source) {
+  // 入力検証
+  if (!source || typeof source !== 'object' || Array.isArray(source)) {
+    return target || {};
+  }
+  
+  if (!target || typeof target !== 'object' || Array.isArray(target)) {
+    target = {};
+  }
+  
+  const result = { ...target };
+  
+  for (const key in source) {
+    // セキュリティチェック：プロトタイプ汚染対策
+    if (!Object.prototype.hasOwnProperty.call(source, key) ||
+        key === '__proto__' || key === 'constructor' || key === 'prototype') {
+      continue;
+    }
+    
+    const sourceValue = source[key];
+    const targetValue = result[key];
+    
+    // undefinedは無視（既存の設定を削除しない）
+    if (sourceValue === undefined) {
+      continue;
+    }
+    
+    // プレーンオブジェクトのみ再帰処理
+    if (isPlainObject(sourceValue)) {
+      result[key] = deepMerge(targetValue, sourceValue);
+    } else {
+      result[key] = sourceValue;
+    }
+  }
+  
+  return result;
+}
 
 async function loadConfig() {
   try {
+    // ベース設定を読み込み
     const configText = await Deno.readTextFile(CONFIG_FILE);
-    return JSON.parse(configText);
+    let config = JSON.parse(configText);
+
+    // ローカル設定があれば読み込んでマージ
+    try {
+      const localConfigText = await Deno.readTextFile(LOCAL_CONFIG_FILE);
+      const localConfig = JSON.parse(localConfigText);
+      config = deepMerge(config, localConfig);
+    } catch {
+      // ローカル設定ファイルが存在しない場合は無視
+    }
+
+    return config;
   } catch (error) {
     console.error(`設定ファイルの読み込みエラー: ${error.message}`);
     throw error;
   }
-}
-
-function getEnvFloat(key) {
-  const value = Deno.env.get(key);
-  if (!value) throw new Error(`環境変数 ${key} が設定されていません`);
-  const parsed = parseFloat(value);
-  if (isNaN(parsed)) throw new Error(`環境変数 ${key} は有効な数値ではありません`);
-  return parsed;
 }
 
 function buildThresholds(currencyConfig, hold) {
@@ -77,7 +125,7 @@ function formatPosition({ pair, bid, ask, hold, quantity, slip }, config, thresh
   const price = config.display.type === 'bid' ? bid : ask;
   const pips = calcPips(pair, price, hold, config);
   const adjustedPips = pips !== null ? pips + (slip || 0) : null;
-  const profit = adjustedPips && quantity ? adjustedPips * quantity : '';
+  const profit = adjustedPips && quantity ? adjustedPips * quantity * 10 : '';
 
   const currencyConfig = config.currencies[pair] || {};
   const symbol = currencyConfig.symbol || pair;
@@ -120,16 +168,36 @@ async function fetchQuotes(config) {
 async function main() {
   try {
     const config = await loadConfig();
-    const hold = getEnvFloat('HOLD');
-    const pair = Deno.env.get('PAIR') || config.defaults.pair;
 
-    const positions = [{ pair, hold, monitoring: true, priority: 1 }];
+    // positionsセクションから設定を読み込み
+    const positions = [];
+    if (config.positions) {
+      for (const [pair, posConfig] of Object.entries(config.positions)) {
+        if (posConfig.monitoring) {
+          positions.push({
+            pair,
+            hold: posConfig.hold,
+            quantity: posConfig.lot || posConfig.quantity,
+            slip: posConfig.slip || 0,
+            monitoring: true,
+            priority: posConfig.priority || positions.length + 1,
+          });
+        }
+      }
+    }
+
+    // positionsが空の場合はデフォルト設定を使用
+    if (positions.length === 0) {
+      console.error('監視対象の通貨ペアが設定されていません');
+      Deno.exit(1);
+    }
 
     // 各通貨ペアのしきい値を事前に計算
     const thresholds = {};
-    for (const [currencyPair, currencyConfig] of Object.entries(config.currencies)) {
-      if (currencyConfig.thresholds) {
-        thresholds[currencyPair] = buildThresholds(currencyConfig, hold);
+    for (const position of positions) {
+      const currencyConfig = config.currencies[position.pair];
+      if (currencyConfig && currencyConfig.thresholds) {
+        thresholds[position.pair] = buildThresholds(currencyConfig, position.hold);
       }
     }
 

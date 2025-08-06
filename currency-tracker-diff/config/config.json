@@ -26,6 +26,15 @@
       "multiplier": 1000
     }
   },
+  "positions": {
+    "USDJPY": {
+      "hold": 147.779,
+      "lot": 1000,
+      "slip": 0,
+      "monitoring": true,
+      "priority": 1
+    }
+  },
   "defaults": {
     "multiplier": 1000,
     "pair": "USDJPY"
