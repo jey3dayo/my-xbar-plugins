@@ -8,10 +8,7 @@ const CONFIG_FILE = `${SCRIPT_DIR}/config/config.json`;
 const LOCAL_CONFIG_FILE = `${SCRIPT_DIR}/config/config.local.json`;
 
 function isPlainObject(obj) {
-  return obj !== null &&
-         typeof obj === 'object' &&
-         !Array.isArray(obj) &&
-         obj.constructor === Object;
+  return obj !== null && typeof obj === 'object' && !Array.isArray(obj) && obj.constructor === Object;
 }
 
 function deepMerge(target, source) {
@@ -19,28 +16,32 @@ function deepMerge(target, source) {
   if (!source || typeof source !== 'object' || Array.isArray(source)) {
     return target || {};
   }
-  
+
   if (!target || typeof target !== 'object' || Array.isArray(target)) {
     target = {};
   }
-  
+
   const result = { ...target };
-  
+
   for (const key in source) {
     // セキュリティチェック：プロトタイプ汚染対策
-    if (!Object.prototype.hasOwnProperty.call(source, key) ||
-        key === '__proto__' || key === 'constructor' || key === 'prototype') {
+    if (
+      !Object.prototype.hasOwnProperty.call(source, key) ||
+      key === '__proto__' ||
+      key === 'constructor' ||
+      key === 'prototype'
+    ) {
       continue;
     }
-    
+
     const sourceValue = source[key];
     const targetValue = result[key];
-    
+
     // undefinedは無視（既存の設定を削除しない）
     if (sourceValue === undefined) {
       continue;
     }
-    
+
     // プレーンオブジェクトのみ再帰処理
     if (isPlainObject(sourceValue)) {
       result[key] = deepMerge(targetValue, sourceValue);
@@ -48,7 +49,7 @@ function deepMerge(target, source) {
       result[key] = sourceValue;
     }
   }
-  
+
   return result;
 }
 
